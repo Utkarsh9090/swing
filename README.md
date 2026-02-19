@@ -4,11 +4,11 @@ A powerful swing trading assistant tailored for the Indian Stock Market. This to
 
 ## 🚀 Key Features
 
-*   **Smart Scoring Engine**: Evaluates stocks on a 0-10 scale using 10+ technical indicators (RSI, MACD, ADX, Trend, Volume, etc.) to identify "Strong Buy" opportunities.
-*   **Automated Trade Setups**: Instantly generates precise Entry, Target (1:2 & 1:3 R:R), and Stop Loss levels based on Volatility (ATR) and Support/Resistance zones.
-*   **Interactive Dashboard**: Real-time monitoring of NIFTY 50, with intuitive filters for Market Cap, Sector, and Signal strength alongside a personal Watchlist.
-*   **Visual Analysis**: Integrated interactive charts (TradingView style) showing 6 months of price action with overlay indicators and signal visualizations.
-*   **Comprehensive Screening**: Scans the market for Candlestick Patterns (Bullish Engulfing, Hammer, etc.) and volume anomalies to confirm trend reversals.
+*   **Smart Scoring Engine**: Proprietary 0-10 ranking system fusing Trend, Momentum, and Volume for high-probability signals.
+*   **Algorithmic Trade Setups**: Instant calculation of precise Entry, Targets, and Stop Loss adapted to current market volatility.
+*   **Real-Time Dashboard**: Live NIFTY monitoring with advanced filtering, sector breakdowns, and watchlist management.
+*   **Pro-Level Charting**: Interactive, TradingView-powered visualizations with automated signal and indicator overlays.
+*   **Deep Market Scanning**: Automatically detects bullish candlestick patterns and volume anomalies to validate breakouts.
 
 ## 🛠️ Installation & Setup
 
