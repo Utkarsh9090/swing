@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description"
+        content="Indian Stock Swing Trading Screener - Find high-probability swing trading opportunities with multi-factor technical analysis">
+    <title>SwingTrade India - Stock Screener</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <!-- TradingView Lightweight Charts -->
+    <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-left">
+                <div class="logo">
+                    <span class="logo-icon">📈</span>
+                    <span class="logo-text">SwingTrade<span class="logo-accent">India</span></span>
+                </div>
+            </div>
+            <div class="header-center">
+                <div class="market-status" id="marketStatus">
+                    <span class="market-label">NIFTY 50</span>
+                    <span class="market-price" id="niftyPrice">--</span>
+                    <span class="market-change" id="niftyChange">--</span>
+                    <span class="market-badge" id="marketBadge">Loading...</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <button class="btn btn-refresh" id="refreshBtn" onclick="refreshData()">
+                    <span class="btn-icon">🔄</span>
+                    <span>Refresh</span>
+                </button>
+                <button class="btn btn-watchlist" onclick="showWatchlist()">
+                    <span class="btn-icon">⭐</span>
+                    <span>Watchlist</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Stats Bar -->
+            <div class="stats-bar">
+                <div class="stat-card">
+                    <span class="stat-icon">🎯</span>
+                    <div class="stat-content">
+                        <span class="stat-value" id="strongBuyCount">0</span>
+                        <span class="stat-label">Strong Buy</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">📊</span>
+                    <div class="stat-content">
+                        <span class="stat-value" id="buyCount">0</span>
+                        <span class="stat-label">Buy Signals</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">👁️</span>
+                    <div class="stat-content">
+                        <span class="stat-value" id="watchlistCount">0</span>
+                        <span class="stat-label">Watchlist</span>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-icon">⏱️</span>
+                    <div class="stat-content">
+                        <span class="stat-value" id="lastUpdate">--</span>
+                        <span class="stat-label">Last Update</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top Picks Section -->
+            <section class="section top-picks-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="title-icon">🔥</span>
+                        Today's Top Picks
+                        <span class="title-badge">Score 7+</span>
+                    </h2>
+                </div>
+                <div class="top-picks-grid" id="topPicksGrid">
+                    <div class="loading-card">
+                        <div class="spinner"></div>
+                        <p>Screening stocks...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Filters -->
+            <section class="filters-section">
+                <div class="filter-group">
+                    <label class="filter-label">Market Cap</label>
+                    <select class="filter-select" id="marketCapFilter" onchange="applyFilters()">
+                        <option value="">All Caps</option>
+                        <option value="Large Cap">Large Cap</option>
+                        <option value="Mid Cap">Mid Cap</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Sector</label>
+                    <select class="filter-select" id="sectorFilter" onchange="applyFilters()">
+                        <option value="">All Sectors</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Min Score</label>
+                    <select class="filter-select" id="scoreFilter" onchange="applyFilters()">
+                        <option value="0" selected>All Stocks</option>
+                        <option value="5">5+ (Watchlist)</option>
+                        <option value="6">6+ (Potential)</option>
+                        <option value="7">7+ (Buy)</option>
+                        <option value="8">8+ (Strong Buy)</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Signal</label>
+                    <select class="filter-select" id="signalFilter" onchange="applyFilters()">
+                        <option value="">All Signals</option>
+                        <option value="STRONG_BUY">Strong Buy</option>
+                        <option value="BUY">Buy</option>
+                        <option value="WATCHLIST">Watchlist</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <input type="text" class="filter-search" id="searchInput" placeholder="Search symbol..."
+                        oninput="applyFilters()">
+                </div>
+            </section>
+
+            <!-- Stock Table -->
+            <section class="section table-section">
+                <div class="section-header">
+                    <h2 class="section-title">
+                        <span class="title-icon">📋</span>
+                        Screened Stocks
+                        <span class="stock-count" id="stockCount">(0 stocks)</span>
+                    </h2>
+                </div>
+                <div class="table-container">
+                    <table class="stock-table" id="stockTable">
+                        <thead>
+                            <tr>
+                                <th class="th-action"></th>
+                                <th class="sortable" onclick="sortTable('symbol')">Symbol</th>
+                                <th class="sortable" onclick="sortTable('sector')">Sector</th>
+                                <th class="sortable" onclick="sortTable('price')">Price</th>
+                                <th class="sortable" onclick="sortTable('change')">Change</th>
+                                <th class="sortable" onclick="sortTable('rsi')">RSI</th>
+                                <th>MACD</th>
+                                <th class="sortable" onclick="sortTable('volume')">Volume</th>
+                                <th class="sortable" onclick="sortTable('score')">Score</th>
+                                <th>Signal</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="stockTableBody">
+                            <tr>
+                                <td colspan="11" class="loading-cell">
+                                    <div class="spinner"></div>
+                                    <p>Loading stock data...</p>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+
+        <!-- Stock Detail Modal -->
+        <div class="modal" id="stockModal">
+            <div class="modal-overlay" onclick="closeModal()"></div>
+            <div class="modal-content">
+                <button class="modal-close" onclick="closeModal()">✕</button>
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <div class="modal-title-group">
+                        <h2 class="modal-title" id="modalSymbol">--</h2>
+                        <p class="modal-subtitle" id="modalName">--</p>
+                    </div>
+                    <div class="modal-price-group">
+                        <span class="modal-price" id="modalPrice">₹--</span>
+                        <span class="modal-change" id="modalChange">--</span>
+                    </div>
+                </div>
+
+                <!-- Score Section -->
+                <div class="modal-score-section">
+                    <div class="score-circle" id="modalScoreCircle">
+                        <span class="score-value" id="modalScore">--</span>
+                        <span class="score-label">/10</span>
+                    </div>
+                    <div class="score-details">
+                        <div class="signal-badge" id="modalSignal">--</div>
+                        <p class="signal-text" id="modalSignalText">--</p>
+                    </div>
+                </div>
+
+                <!-- Trade Setup -->
+                <div class="trade-setup-section">
+                    <h3 class="setup-title">📍 Trade Setup</h3>
+                    <div class="setup-grid">
+                        <div class="setup-card setup-entry">
+                            <span class="setup-label">Entry</span>
+                            <span class="setup-value" id="modalEntry">₹--</span>
+                        </div>
+                        <div class="setup-card setup-target">
+                            <span class="setup-label">Target 1</span>
+                            <span class="setup-value" id="modalTarget1">₹--</span>
+                        </div>
+                        <div class="setup-card setup-target2">
+                            <span class="setup-label">Target 2</span>
+                            <span class="setup-value" id="modalTarget2">₹--</span>
+                        </div>
+                        <div class="setup-card setup-stoploss">
+                            <span class="setup-label">Stop Loss</span>
+                            <span class="setup-value" id="modalStopLoss">₹--</span>
+                        </div>
+                    </div>
+                    <div class="rr-info">
+                        <span>Risk: <strong id="modalRisk">--%</strong></span>
+                        <span>Reward: <strong id="modalReward">--%</strong></span>
+                        <span>R:R Ratio: <strong id="modalRR">1:--</strong></span>
+                    </div>
+                </div>
+
+                <!-- Chart -->
+                <div class="chart-section">
+                    <div class="chart-header">
+                        <h3 class="chart-title">📊 Price Chart (6 Months)</h3>
+                        <a href="#" id="tradingViewLink" target="_blank" class="tradingview-btn">
+                            <span>📈 Open in TradingView</span>
+                        </a>
+                    </div>
+                    <div class="chart-container chart-clickable" id="chartContainer"
+                        title="Click to open in TradingView"></div>
+                </div>
+
+                <!-- Indicators -->
+                <div class="indicators-section">
+                    <h3 class="indicators-title">📈 Technical Indicators</h3>
+                    <div class="indicators-grid" id="indicatorsGrid">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+
+                <!-- Score Breakdown -->
+                <div class="breakdown-section">
+                    <h3 class="breakdown-title">🎯 Score Breakdown</h3>
+                    <div class="breakdown-list" id="breakdownList">
+                        <!-- Populated by JS -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Watchlist Modal -->
+        <div class="modal" id="watchlistModal">
+            <div class="modal-overlay" onclick="closeWatchlistModal()"></div>
+            <div class="modal-content modal-watchlist">
+                <button class="modal-close" onclick="closeWatchlistModal()">✕</button>
+                <h2 class="modal-title">⭐ My Watchlist</h2>
+                <div class="watchlist-content" id="watchlistContent">
+                    <p class="empty-watchlist">No stocks in watchlist. Click ⭐ to add stocks.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reasons Modal -->
+        <div class="modal" id="reasonsModal">
+            <div class="modal-overlay" onclick="closeReasonsModal()"></div>
+            <div class="modal-content modal-reasons">
+                <button class="modal-close" onclick="closeReasonsModal()">✕</button>
+                <h2 class="modal-title" id="reasonsModalTitle">📊 Signal Reasons</h2>
+                <div class="reasons-modal-content" id="reasonsModalContent">
+                    <!-- Populated by JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/js/app.js"></script>
+</body>
+
+</html>
